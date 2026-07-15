@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\ReactableType;
 use App\Enums\ReactionType;
+use App\Exceptions\ApiException;
 use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -21,14 +22,22 @@ class CommentController extends Controller
         'body' => 'string|min:3',
     ];
 
+    public function getComments()
+    {
+        return $this->getAll();
+    }
+
     public function getCommentsByPost($post_id)
     {
         return Comment::select('comments.body', 'users.username')->join('users', 'users.id', '=', 'comments.user_id')->where('post_id', $post_id)->get();
     }
 
-    public function getComments()
-    {
-        return $this->getAll();
+    public function  getCommentsCount() {
+        $item = ($this->modelClass)::all()->count();
+        if (!$item) {
+            throw new ApiException('NOT_FOUND', class_basename($this->modelClass) . ' not found.', 404);
+        }
+        return response()->json($item, 200);
     }
 
     public function addComment(Request $request)
@@ -44,13 +53,15 @@ class CommentController extends Controller
         return $this->delete($id);
     }
 
-    public function reactToComment(Request $request, Comment $comment)
+    public function reactToComment(Request $request)
     {
         $this->reactRules = [
+            'user_id' => 'required|integer',
+            'reactable_id' => 'required|integer',
             'reactable_type' => ['required', Rule::in(ReactableType::values())],
             'type' => ['required', Rule::in(ReactionType::values())],
         ];
 
-        return $this->react($request, $comment);
+        return $this->react($request);
     }
 }

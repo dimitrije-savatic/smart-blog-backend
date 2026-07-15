@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 
 // Authenticated User only routes
 Route::middleware('auth:sanctum')->group(function () {
@@ -8,7 +9,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/posts', [\App\Http\Controllers\PostController::class, 'createPost']);
     Route::delete('/posts/{id}', [\App\Http\Controllers\PostController::class, 'deletePost']);
     Route::put('/posts/{id}', [\App\Http\Controllers\PostController::class, 'updatePost']);
-    Route::post('posts/{post_id}/reaction', [\App\Http\Controllers\PostController::class, 'reactToPost']);
+    Route::post('posts/{post_id}/reactions', [\App\Http\Controllers\PostController::class, 'reactToPost']);
 
     //Categories
     Route::post('/categories', [\App\Http\Controllers\CategoryController::class, 'createCategory']);
@@ -19,7 +20,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/comments', [\App\Http\Controllers\CommentController::class, 'addComment']);
     Route::put('/comments/{id}', [\App\Http\Controllers\CommentController::class, 'updateComment']);
     Route::delete('/comments/{id}', [\App\Http\Controllers\CommentController::class, 'deleteComment']);
-    Route::post('/comments/{comment}/reaction', [\App\Http\Controllers\CommentController::class, 'reactToComment']);
+    Route::post('/comments/{comment_id}/reactions', [\App\Http\Controllers\CommentController::class, 'reactToComment']);
 
     //Reactions
     Route::post('/reactions', [\App\Http\Controllers\ReactionController::class, 'addReaction']);
@@ -50,15 +51,19 @@ Route::middleware('reject.get.body')->group(function () {
 
     //Users
     Route::get('/users', [\App\Http\Controllers\UserController::class, 'users']);
+    Route::get('/users/count', [\App\Http\Controllers\UserController::class, 'getUsersCount']);
     Route::get('/users/{id}', [\App\Http\Controllers\UserController::class, 'user']);
 
     //Comments
     Route::get('/comments', [\App\Http\Controllers\CommentController::class, 'getComments']);
+    Route::get('/comments/count', [\App\Http\Controllers\CommentController::class, 'getCommentsCount']);
     Route::get('/comments/{post_id}', [\App\Http\Controllers\CommentController::class, 'getCommentsByPost']);
 
     //Reactions
     Route::get('/reactions', [\App\Http\Controllers\ReactionController::class, 'getReactions']);
-    Route::get('/reactions/{post_id}', [\App\Http\Controllers\ReactionController::class, 'getReactionsByPost']);
+    Route::get('/reactions/count', [\App\Http\Controllers\ReactionController::class, 'getReactionsCount']);
+    Route::get('/reactions/{reactable_id}', [\App\Http\Controllers\ReactionController::class, 'getReactionsByPost']);
+
 
     //Testimonials
     Route::get('/testimonials', [\App\Http\Controllers\TestimonialController::class, 'getTestimonials']);

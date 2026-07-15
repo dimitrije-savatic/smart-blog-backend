@@ -20,15 +20,16 @@ class PostService
             'id' => $post->id,
             'title' => $post->title,
             'body' => $post->body,
-
             'author' => [
                 'id' => $post->author->id,
                 'username' => $post->author->username,
+                'first_name' => $post->author->first_name,
+                'last_name' => $post->author->last_name,
+                'email' => $post->author->email,
             ],
             'categories' => $post->categories,
             'reaction_counts' =>
                 $this->getPostReactionCounts($post->id),
-
             'comments' =>
                 $this->commentService->getCommentTreeWithReactions($post->id),
         ];

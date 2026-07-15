@@ -117,30 +117,33 @@ abstract class Controller
         }
     }
 
-    public function react(Request $request, Model $model): \Illuminate\Http\JsonResponse
+    public function react(Request $request): \Illuminate\Http\JsonResponse
     {
         $data = validate($request, $this->reactRules);
         $existing = Reaction::where([
             'user_id' => auth()->id(),
-            'reactable_id' => $model->id,
-            'reactable_type' => $model::class,
+            'reactable_id' => $request->reactable_id,
+            'reactable_type' => $request->reactable_type,
         ])->first();
-
+        $existingModel = $this->modelClass::find($request->reactable_id);
+        if(!$existingModel) {
+            return response()->json(['message' => class_basename($this->modelClass) . ' doesn\'t exist.'], 404);
+        }
         // remove if same reaction
         if ($existing && $existing->type === $data['type']) {
             $existing->delete();
 
             return response()->json([
                 'message' => 'Reaction removed.'
-            ]);
+            ], 204);
         }
 
         // otherwise create/update
         $reaction = Reaction::updateOrCreate(
             [
                 'user_id' => auth()->id(),
-                'reactable_id' => $model->id,
-                'reactable_type' => $model::class,
+                'reactable_id' => $request->reactable_id,
+                'reactable_type' => $request->reactable_type,
             ],
             [
                 'type' => $data['type'],
@@ -149,7 +152,6 @@ abstract class Controller
 
         return response()->json([
             'message' => 'Reaction saved.',
-            'data' => $reaction
-        ]);
+        ], 201);
     }
 }

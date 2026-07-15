@@ -4,8 +4,8 @@ namespace App\Enums;
 
 enum ReactionType : string
 {
-    case LIKE = 'post';
-    case LOVE = 'comment';
+    case LIKE = 'like';
+    case LOVE = 'love';
     case LAUGH = 'laugh';
     case SAD = 'sad';
     case ANGRY = 'angry';

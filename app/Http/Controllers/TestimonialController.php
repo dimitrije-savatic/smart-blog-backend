@@ -15,9 +15,7 @@ class TestimonialController extends Controller
 
     public function getTestimonials()
     {
-        return Testimonial::select('testimonials.testimonial', 'users.first_name', 'users.last_name', 'users.email')->
-        join('users', 'testimonials.user_id', '=', 'users.id')->
-        orderBy('testimonials.created_at', 'desc')->get();
+        return Testimonial::with('user')->orderBy('testimonials.created_at', 'desc')->get();
     }
 
     public function createTestimonial(Request $request){

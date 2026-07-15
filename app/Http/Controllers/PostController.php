@@ -32,18 +32,16 @@ class PostController extends Controller
     }
     public function getPosts()
     {
-        return Post::with('categories')->with('reactions')->get();
+        return Post::with('categories')->get();
     }
 
     public function getLatestPosts() {
-        return $posts = Post::latest()->take(3)->get();
+        return $posts = Post::latest()->with('categories')->with('reactions')->take(3)->get();
     }
 
     public function getPost(int $id)
     {
-        return response()->json(
-            $this->postService->getPostDetails($id)
-        );
+        return response()->json($this->postService->getPostDetails($id));
     }
 
     public function createPost(Request $request)
@@ -61,13 +59,14 @@ class PostController extends Controller
         return $this->delete($id);
     }
 
-    public function reactToPost(Request $request, Post $post)
+    public function reactToPost(Request $request)
     {
         $this->reactRules = [
+            'user_id' => 'required|integer',
+            'reactable_id' => 'required|integer',
             'reactable_type' => ['required', Rule::in(ReactableType::values())],
             'type' => ['required', Rule::in(ReactionType::values())],
         ];
-
-        return $this->react($request, $post);
+        return $this->react($request);
     }
 }
