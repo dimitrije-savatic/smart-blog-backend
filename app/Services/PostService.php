@@ -13,19 +13,19 @@ class PostService
 
     public function getPostDetails(int $id): array
     {
-        $post = Post::with('author')
+        $post = Post::with('author')->with('categories')
             ->findOrFail($id);
 
         return [
             'id' => $post->id,
             'title' => $post->title,
-            'content' => $post->body,
+            'body' => $post->body,
 
             'author' => [
                 'id' => $post->author->id,
                 'username' => $post->author->username,
             ],
-
+            'categories' => $post->categories,
             'reaction_counts' =>
                 $this->getPostReactionCounts($post->id),
 

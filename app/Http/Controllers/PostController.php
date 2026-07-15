@@ -30,12 +30,16 @@ class PostController extends Controller
     {
         $item->categories()->sync($request->category_ids);
     }
-    public function posts()
+    public function getPosts()
     {
-        return Post::with('categories')->paginate();
+        return Post::with('categories')->with('reactions')->get();
     }
 
-    public function singlePost(int $id)
+    public function getLatestPosts() {
+        return $posts = Post::latest()->take(3)->get();
+    }
+
+    public function getPost(int $id)
     {
         return response()->json(
             $this->postService->getPostDetails($id)

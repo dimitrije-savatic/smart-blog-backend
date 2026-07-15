@@ -8,7 +8,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/posts', [\App\Http\Controllers\PostController::class, 'createPost']);
     Route::delete('/posts/{id}', [\App\Http\Controllers\PostController::class, 'deletePost']);
     Route::put('/posts/{id}', [\App\Http\Controllers\PostController::class, 'updatePost']);
-    Route::post('posts/{post}/reaction', [\App\Http\Controllers\PostController::class, 'reactToPost']);
+    Route::post('posts/{post_id}/reaction', [\App\Http\Controllers\PostController::class, 'reactToPost']);
 
     //Categories
     Route::post('/categories', [\App\Http\Controllers\CategoryController::class, 'createCategory']);
@@ -40,8 +40,9 @@ Route::middleware('auth:sanctum')->group(function () {
 // GET routes
 Route::middleware('reject.get.body')->group(function () {
     //Posts
-    Route::get('/posts', [\App\Http\Controllers\PostController::class, 'posts']);
-    Route::get('/posts/{id}', [\App\Http\Controllers\PostController::class, 'singlePost']);
+    Route::get('/posts', [\App\Http\Controllers\PostController::class, 'getPosts']);
+    Route::get('/posts/latest', [\App\Http\Controllers\PostController::class, 'getLatestPosts']);
+    Route::get('/posts/{id}', [\App\Http\Controllers\PostController::class, 'getPost']);
 
     //Categories
     Route::get('/categories', [\App\Http\Controllers\CategoryController::class, 'categories']);
