@@ -34,18 +34,16 @@ class CommentService
 
             return [
                 'id' => $comment->id,
-                'content' => $comment->content,
-
+                'body' => $comment->body,
                 'user' => [
                     'id' => $comment->user->id,
-                    'name' => $comment->user->name,
+                    'first_name' => $comment->user->first_name,
+                    'last_name' => $comment->user->last_name,
                 ],
-
                 'reaction_counts' =>
                     $this->formatReactions(
                         $reactions[$comment->id] ?? collect()
                     ),
-
                 'replies' =>
                     $this->buildTree($grouped, $comment->id, $reactions),
             ];

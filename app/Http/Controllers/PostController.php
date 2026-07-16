@@ -30,6 +30,7 @@ class PostController extends Controller
     {
         $item->categories()->sync($request->category_ids);
     }
+
     public function getPosts()
     {
         return Post::with('categories')->get();

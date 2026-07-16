@@ -37,7 +37,7 @@ class PostService
 
     private function getPostReactionCounts(int $postId): array
     {
-        return Reaction::where('reactable_type', Post::class)
+        return Reaction::where('reactable_type', 'post')
             ->where('reactable_id', $postId)
             ->selectRaw('type, COUNT(*) as total')
             ->groupBy('type')
