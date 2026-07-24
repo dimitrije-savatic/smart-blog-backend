@@ -44,6 +44,7 @@ class CommentService
                     $this->formatReactions(
                         $reactions[$comment->id] ?? collect()
                     ),
+                'users_reaction' => $this->getUsersReaction($comment->id),
                 'replies' =>
                     $this->buildTree($grouped, $comment->id, $reactions),
             ];
@@ -52,7 +53,7 @@ class CommentService
 
     private function getGroupedReactions(array $commentIds)
     {
-        return Reaction::where('reactable_type', Comment::class)
+        return Reaction::where('reactable_type', strtolower(class_basename(Comment::class)))
             ->whereIn('reactable_id', $commentIds)
             ->selectRaw('reactable_id, type, COUNT(*) as total')
             ->groupBy('reactable_id', 'type')
@@ -65,5 +66,21 @@ class CommentService
         return $reactions
             ->pluck('total', 'type')
             ->toArray();
+    }
+
+    private function getUsersReaction(int $commentId): bool
+    {
+        $usersReaction =  Reaction::where('reactable_type', strtolower(class_basename(Comment::class)))
+            ->where('reactable_id', $commentId)
+            ->where('user_id', auth()->id())
+            ->selectRaw('type, COUNT(*) as total')
+            ->groupBy('type')
+            ->pluck('total', 'type')
+            ->toArray();
+
+        if($usersReaction){
+            return true;
+        }
+        return false;
     }
 }

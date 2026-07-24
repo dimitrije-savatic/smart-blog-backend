@@ -5,11 +5,10 @@ namespace App\Enums;
 enum ReactionType : string
 {
     case LIKE = 'like';
-    case LOVE = 'love';
-    case LAUGH = 'laugh';
-    case SAD = 'sad';
-    case ANGRY = 'angry';
+    case HEART = 'heart';
     case HAPPY = 'happy';
+    case SAD = 'sad';
+    case FIRE = 'fire';
 
     public static function values(): array
     {

@@ -30,6 +30,8 @@ class PostService
             'categories' => $post->categories,
             'reaction_counts' =>
                 $this->getPostReactionCounts($post->id),
+            'users_reaction' =>
+                $this->getUsersReaction($post->id),
             'comments' =>
                 $this->commentService->getCommentTreeWithReactions($post->id),
         ];
@@ -39,6 +41,17 @@ class PostService
     {
         return Reaction::where('reactable_type', 'post')
             ->where('reactable_id', $postId)
+            ->selectRaw('type, COUNT(*) as total')
+            ->groupBy('type')
+            ->pluck('total', 'type')
+            ->toArray();
+    }
+
+    private function getUsersReaction(int $postId): array
+    {
+        return Reaction::where('reactable_type', 'post')
+            ->where('reactable_id', $postId)
+            ->where('user_id', auth()->id())
             ->selectRaw('type, COUNT(*) as total')
             ->groupBy('type')
             ->pluck('total', 'type')

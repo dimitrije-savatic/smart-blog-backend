@@ -43,7 +43,7 @@ Route::middleware('reject.get.body')->group(function () {
     //Posts
     Route::get('/posts', [\App\Http\Controllers\PostController::class, 'getPosts']);
     Route::get('/posts/latest', [\App\Http\Controllers\PostController::class, 'getLatestPosts']);
-    Route::get('/posts/{id}', [\App\Http\Controllers\PostController::class, 'getPost']);
+    Route::middleware('auth:sanctum')->get('/posts/{id}', [\App\Http\Controllers\PostController::class, 'getPost']);
 
     //Categories
     Route::get('/categories', [\App\Http\Controllers\CategoryController::class, 'categories']);
