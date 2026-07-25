@@ -60,14 +60,4 @@ class PostController extends Controller
         return $this->delete($id);
     }
 
-    public function reactToPost(Request $request)
-    {
-        $this->reactRules = [
-            'user_id' => 'required|integer',
-            'reactable_id' => 'required|integer',
-            'reactable_type' => ['required', Rule::in(ReactableType::values())],
-            'type' => ['required', Rule::in(ReactionType::values())],
-        ];
-        return $this->react($request);
-    }
 }

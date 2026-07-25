@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use App\Enums\ReactableType;
 use App\Enums\ReactionType;
 use App\Exceptions\ApiException;
+use App\Models\Comment;
+use App\Models\Post;
 use App\Models\Reaction;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
@@ -50,5 +53,19 @@ class ReactionController extends Controller
 
     public function deleteReaction(int $id) {
         return $this->delete($id);
+    }
+
+    public function counts(){
+        $counts = [User::class, Post::class, Comment::class, Reaction::class];
+        foreach ($counts as $count) {
+            if (!($count)::all()->count()) {
+                throw new ApiException('NOT_FOUND', class_basename($this->modelClass) . ' not found.', 404);
+            }
+        }
+        $users = User::all()->count();
+        $reactions = Reaction::all()->count();
+        $comments = Comment::all()->count();
+
+        return response()->json([['name' => 'users', 'number' => $users], ['name' => 'reactions', 'number' => $reactions], ['name' => 'comments', 'number' => $comments]], 200);
     }
 }

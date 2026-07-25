@@ -9,7 +9,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/posts', [\App\Http\Controllers\PostController::class, 'createPost']);
     Route::delete('/posts/{id}', [\App\Http\Controllers\PostController::class, 'deletePost']);
     Route::put('/posts/{id}', [\App\Http\Controllers\PostController::class, 'updatePost']);
-    Route::post('posts/{post_id}/reactions', [\App\Http\Controllers\PostController::class, 'reactToPost']);
 
     //Categories
     Route::post('/categories', [\App\Http\Controllers\CategoryController::class, 'createCategory']);
@@ -20,7 +19,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/comments', [\App\Http\Controllers\CommentController::class, 'addComment']);
     Route::put('/comments/{id}', [\App\Http\Controllers\CommentController::class, 'updateComment']);
     Route::delete('/comments/{id}', [\App\Http\Controllers\CommentController::class, 'deleteComment']);
-    Route::post('/comments/{comment_id}/reactions', [\App\Http\Controllers\CommentController::class, 'reactToComment']);
 
     //Reactions
     Route::post('/reactions', [\App\Http\Controllers\ReactionController::class, 'addReaction']);
@@ -57,7 +55,7 @@ Route::middleware('reject.get.body')->group(function () {
     //Comments
     Route::get('/comments', [\App\Http\Controllers\CommentController::class, 'getComments']);
     Route::get('/comments/count', [\App\Http\Controllers\CommentController::class, 'getCommentsCount']);
-    Route::get('/comments/{post_id}', [\App\Http\Controllers\CommentController::class, 'getCommentsByPost']);
+    Route::middleware('auth:sanctum')->get('/comments/{post_id}', [\App\Http\Controllers\CommentController::class, 'getCommentsByPost']);
 
     //Reactions
     Route::get('/reactions', [\App\Http\Controllers\ReactionController::class, 'getReactions']);
@@ -70,6 +68,9 @@ Route::middleware('reject.get.body')->group(function () {
 
     //ActivityLog
     Route::get('/logs', [\App\Http\Controllers\ActivityLogController::class, 'logs']);
+
+    //Counts
+    Route::get('/counts',[\App\Http\Controllers\ReactionController::class, 'counts']);
 });
 
 // Auth routes

@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\ApiException;
 use App\Models\ActivityLog;
-use Illuminate\Http\Request;
+use App\Models\Comment;
+use App\Models\Post;
+use App\Models\Reaction;
+use App\Models\User;
 
 class ActivityLogController extends Controller
 {

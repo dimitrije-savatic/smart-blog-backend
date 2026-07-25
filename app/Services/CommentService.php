@@ -35,7 +35,7 @@ class CommentService
             return [
                 'id' => $comment->id,
                 'body' => $comment->body,
-                'user' => [
+                'author' => [
                     'id' => $comment->user->id,
                     'first_name' => $comment->user->first_name,
                     'last_name' => $comment->user->last_name,
@@ -77,7 +77,6 @@ class CommentService
             ->groupBy('type')
             ->pluck('total', 'type')
             ->toArray();
-
         if($usersReaction){
             return true;
         }

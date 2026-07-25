@@ -6,11 +6,18 @@ use App\Enums\ReactableType;
 use App\Enums\ReactionType;
 use App\Exceptions\ApiException;
 use App\Models\Comment;
+use App\Services\CommentService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
 class CommentController extends Controller
 {
+
+    public function __construct(
+        private readonly CommentService $commentService
+    ) {
+    }
+
     protected string $modelClass = Comment::class;
     protected array $createRules = [
         'body' => 'required|string|min:3',
@@ -29,7 +36,7 @@ class CommentController extends Controller
 
     public function getCommentsByPost($post_id)
     {
-        return Comment::select('comments.body', 'users.username')->join('users', 'users.id', '=', 'comments.user_id')->where('post_id', $post_id)->get();
+        return response()->json($this->commentService->getCommentTreeWithReactions($post_id));
     }
 
     public function  getCommentsCount() {
@@ -51,17 +58,5 @@ class CommentController extends Controller
 
     public function deleteComment(int $id){
         return $this->delete($id);
-    }
-
-    public function reactToComment(Request $request)
-    {
-        $this->reactRules = [
-            'user_id' => 'required|integer',
-            'reactable_id' => 'required|integer',
-            'reactable_type' => ['required', Rule::in(ReactableType::values())],
-            'type' => ['required', Rule::in(ReactionType::values())],
-        ];
-
-        return $this->react($request);
     }
 }

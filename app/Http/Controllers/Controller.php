@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Exceptions\ApiException;
+use App\Models\Comment;
+use App\Models\Post;
 use App\Models\Reaction;
+use App\Models\User;
 use App\Services\ActivityLogService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -50,7 +53,7 @@ abstract class Controller
             throw new ApiException('NOT_FOUND', class_basename($this->modelClass) . ' not found.', 404);
         }
         $item = $this->afterGetById($item);
-        return response()->json(['data' => $item], 200);
+        return response()->json($item, 200);
     }
 
     public function getAll(): \Illuminate\Http\JsonResponse
@@ -60,7 +63,7 @@ abstract class Controller
             throw new ApiException('NOT_FOUND', class_basename($this->modelClass) . ' not found.', 404);
         }
         $items = $this->afterGetAll($items);
-        return response()->json(['data' => $items], 200);
+        return response()->json($items, 200);
     }
 
     public function create(Request $request): \Illuminate\Http\JsonResponse
@@ -72,7 +75,7 @@ abstract class Controller
             $this->afterCreate($request, $item);
             ActivityLogService::log('create', class_basename($this->modelClass) . ' created.', $item);
             $item->refresh();
-            return response()->json(['data' => $item], 200);
+            return response()->json([],201);
         } catch (\Throwable $e) {
             throw new ApiException('SERVER_ERROR', $e->getMessage(), 500);
         }
@@ -91,9 +94,7 @@ abstract class Controller
             $item->update($data);
             $this->afterUpdate($request, $item);
             ActivityLogService::log('update', class_basename($this->modelClass) . ' updated.', $item);
-            return response()->json([
-                'data' => $item,
-            ]);
+            return response()->json([],204);
         } catch (\Throwable $e) {
             throw new ApiException('SERVER_ERROR', $e->getMessage(), 500);
         }
@@ -108,8 +109,8 @@ abstract class Controller
         $this->authorize('delete', $item);
         try {
             $item->delete();
-            ActivityLogService::log('delete', class_basename($this->modelClass) . ' deleted.', $item);
-            return response()->json([''], 204);
+            ActivityLogService::log('delete', auth()->user()->username . ' deleted ' . strtolower(class_basename($this->modelClass)) . '.', $item);
+            return response()->json([], 204);
         } catch (\Throwable $e) {
             throw new ApiException('SERVER_ERROR', $e->getMessage(), 500);
         }
