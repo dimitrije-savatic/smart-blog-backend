@@ -45,6 +45,11 @@ class User extends Authenticatable
         return $this->hasMany(Testimonial::class);
     }
 
+    public function views()
+    {
+        return $this->hasMany(View::class);
+    }
+
     /**
      * The attributes that should be hidden for serialization.
      *

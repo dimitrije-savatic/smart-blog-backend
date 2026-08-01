@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use App\Enums\ReactableType;
 use App\Enums\ReactionType;
 use App\Models\Post;
+use App\Models\View;
 use App\Services\PostService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class PostController extends Controller
@@ -37,12 +40,16 @@ class PostController extends Controller
     }
 
     public function getLatestPosts() {
-        return $posts = Post::latest()->with('categories')->with('reactions')->take(3)->get();
+
+        $posts = Post::latest()->with(['categories', 'comments'])->withCount('views')->take(3)->get();
+        return response()->json($posts);
     }
 
     public function getPost(int $id)
     {
-        return response()->json($this->postService->getPostDetails($id));
+        $post = $this->postService->getPostDetails($id);
+        $this->recordView($post['id']);
+        return response()->json($post);
     }
 
     public function createPost(Request $request)
@@ -58,6 +65,53 @@ class PostController extends Controller
     public function deletePost(int $id)
     {
         return $this->delete($id);
+    }
+
+    private function recordView(int $post_id): void
+    {
+        if (auth()->check()) {
+
+            $exists = View::where('post_id', $post_id)
+                ->where('user_id', auth()->id())
+                ->where('created_at', '>=', now()->subDay())
+                ->exists();
+
+            if (! $exists) {
+                View::create([
+                    'post_id' => $post_id,
+                    'user_id' => auth()->id(),
+                ]);
+            }
+
+            return;
+        }
+
+        // Guest
+        $token = Cookie::get('visitor_token');
+
+        if (! $token) {
+            $token = Str::uuid()->toString();
+
+            Cookie::queue(
+                Cookie::make(
+                    'visitor_token',
+                    $token,
+                    60 * 24 * 90 // 90 days cookie duration
+                )
+            );
+        }
+
+        $exists = View::where('post_id', $post_id)
+            ->where('visitor_token', $token)
+            ->where('created_at', '>=', now()->subDay())
+            ->exists();
+
+        if (! $exists) {
+            View::create([
+                'post_id' => $post_id,
+                'visitor_token' => $token,
+            ]);
+        }
     }
 
 }

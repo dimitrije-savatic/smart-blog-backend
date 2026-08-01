@@ -3,10 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exceptions\ApiException;
-use App\Models\Comment;
-use App\Models\Post;
 use App\Models\Reaction;
-use App\Models\User;
 use App\Services\ActivityLogService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -20,13 +17,9 @@ abstract class Controller
     protected array $reactRules = [];
 
     // ---- HOOKS ----
-    protected function beforeCreate(array $data)
-    {
-    }
+    protected function beforeCreate(array $data) {}
 
-    protected function afterCreate(Request $request, Model $item): void
-    {
-    }
+    protected function afterCreate(Request $request, Model $item): void {}
 
     protected function afterGetAll($items)
     {
@@ -38,13 +31,9 @@ abstract class Controller
         return $item;
     }
 
-    protected function beforeUpdate(Request $request): void
-    {
-    }
+    protected function beforeUpdate(Request $request): void {}
 
-    protected function afterUpdate(Request $request, Model $item): void
-    {
-    }
+    protected function afterUpdate(Request $request, Model $item): void {}
 
     public function getById(int $id): \Illuminate\Http\JsonResponse
     {
@@ -73,9 +62,9 @@ abstract class Controller
         try {
             $item = ($this->modelClass)::create($data);
             $this->afterCreate($request, $item);
-            ActivityLogService::log('create', class_basename($this->modelClass) . ' created.', $item);
+            ActivityLogService::log('create', auth()->user()->username . ' created ' . strtolower(class_basename($this->modelClass)) . '.', $item);
             $item->refresh();
-            return response()->json([],201);
+            return response()->json([], 201);
         } catch (\Throwable $e) {
             throw new ApiException('SERVER_ERROR', $e->getMessage(), 500);
         }
@@ -93,8 +82,8 @@ abstract class Controller
         try {
             $item->update($data);
             $this->afterUpdate($request, $item);
-            ActivityLogService::log('update', class_basename($this->modelClass) . ' updated.', $item);
-            return response()->json([],204);
+            ActivityLogService::log('update', auth()->user()->username . ' updated ' . strtolower(class_basename($this->modelClass)) . '.', $item);
+            return response()->json([], 204);
         } catch (\Throwable $e) {
             throw new ApiException('SERVER_ERROR', $e->getMessage(), 500);
         }
@@ -125,7 +114,7 @@ abstract class Controller
             'reactable_type' => $request->reactable_type,
         ])->first();
         $existingModel = $this->modelClass::find($request->reactable_id);
-        if(!$existingModel) {
+        if (!$existingModel) {
             return response()->json(['message' => class_basename($this->modelClass) . ' doesn\'t exist.'], 404);
         }
         // remove if same reaction
