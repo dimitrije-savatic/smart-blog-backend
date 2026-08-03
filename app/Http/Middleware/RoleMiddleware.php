@@ -3,14 +3,17 @@
 namespace App\Http\Middleware;
 
 use App\Exceptions\ApiException;
+use App\Models\Role;
+use App\Models\User;
 use Closure;
 
 class RoleMiddleware
 {
     public function handle($request, Closure $next, string $role)
     {
-        $user = $request->attributes->get('user');
 
+        $user = auth()->user();
+        $userRole = Role::where('id', $user->role_id)->select('role')->firstOrFail();
         if (!$user) {
             throw new ApiException(
                 'UNAUTHORIZED',
@@ -19,7 +22,7 @@ class RoleMiddleware
             );
         }
 
-        if ($user->role !== $role) {
+        if ($userRole->role !== $role) {
             throw new ApiException(
                 'FORBIDDEN',
                 'You are not authorized to perform this action.',

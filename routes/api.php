@@ -5,15 +5,18 @@ use Illuminate\Http\Request;
 
 // Authenticated User only routes
 Route::middleware('auth:sanctum')->group(function () {
+    Route::middleware('role:admin')->group(function () {
+        //Posts
+        Route::delete('/posts/{id}', [\App\Http\Controllers\PostController::class, 'deletePost']);
+        Route::put('/posts/{id}', [\App\Http\Controllers\PostController::class, 'updatePost']);
+
+        //Categories
+        Route::post('/categories', [\App\Http\Controllers\CategoryController::class, 'createCategory']);
+        Route::delete('/categories/{id}', [\App\Http\Controllers\CategoryController::class, 'deleteCategory']);
+        Route::put('/categories/{id}', [\App\Http\Controllers\CategoryController::class, 'updateCategory']);
+    });
     //Posts
     Route::post('/posts', [\App\Http\Controllers\PostController::class, 'createPost']);
-    Route::delete('/posts/{id}', [\App\Http\Controllers\PostController::class, 'deletePost']);
-    Route::put('/posts/{id}', [\App\Http\Controllers\PostController::class, 'updatePost']);
-
-    //Categories
-    Route::post('/categories', [\App\Http\Controllers\CategoryController::class, 'createCategory']);
-    Route::delete('/categories/{id}', [\App\Http\Controllers\CategoryController::class, 'deleteCategory']);
-    Route::put('/categories/{id}', [\App\Http\Controllers\CategoryController::class, 'updateCategory']);
 
     //Comments
     Route::post('/comments', [\App\Http\Controllers\CommentController::class, 'addComment']);

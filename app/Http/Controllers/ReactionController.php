@@ -9,6 +9,7 @@ use App\Models\Comment;
 use App\Models\Post;
 use App\Models\Reaction;
 use App\Models\User;
+use App\Models\View;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
@@ -56,16 +57,17 @@ class ReactionController extends Controller
     }
 
     public function counts(){
-        $counts = [User::class, Post::class, Comment::class, Reaction::class];
+        $counts = [User::class, View::class, Comment::class, Reaction::class];
         foreach ($counts as $count) {
             if (!($count)::all()->count()) {
                 throw new ApiException('NOT_FOUND', class_basename($this->modelClass) . ' not found.', 404);
             }
         }
         $users = User::all()->count();
+        $views = View::all()->count();
         $reactions = Reaction::all()->count();
         $comments = Comment::all()->count();
 
-        return response()->json([['name' => 'users', 'number' => $users], ['name' => 'reactions', 'number' => $reactions], ['name' => 'comments', 'number' => $comments]], 200);
+        return response()->json([['name' => 'users', 'number' => $users], ['name' => 'views', 'number' => $views], ['name' => 'reactions', 'number' => $reactions], ['name' => 'comments', 'number' => $comments]], 200);
     }
 }

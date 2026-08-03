@@ -21,8 +21,8 @@ class PostController extends Controller
     }
 
     protected string $modelClass = Post::class;
-    protected array $createRules = ['title' => 'required|string|min:5|max:100', 'body' => 'required|string|min:10', 'user_id' => 'required|integer', 'category_ids' => 'required|array|integer'];
-    protected array $updateRules = ['title' => 'string|min:5|max:100', 'body' => 'string|min:10', 'category_ids' => 'array|integer'];
+    protected array $createRules = [ 'id' => 'required|number','title' => 'required|string|min:5|max:100', 'body' => 'required|string|min:10', 'user_id' => 'required|integer', 'category_ids'=> 'required|array'];
+    protected array $updateRules = ['id' => 'number', 'title' => 'string|min:5|max:100', 'body' => 'string|min:10', 'user_id' => 'integer', 'category_ids'=> 'array'];
 
     protected function afterCreate(Request $request, Model $item) : void
     {
@@ -68,12 +68,12 @@ class PostController extends Controller
 
     public function createPost(Request $request)
     {
-       return $this->create($request);
+       return $this->create($request, $this->createRules);
     }
 
     public function updatePost(Request $request, int $id)
     {
-        return $this->update($request, $id);
+        return $this->update($request, $id, $this->updateRules);
     }
 
     public function deletePost(int $id)
