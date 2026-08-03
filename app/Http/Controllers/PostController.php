@@ -48,8 +48,22 @@ class PostController extends Controller
     public function getPost(int $id)
     {
         $post = $this->postService->getPostDetails($id);
-        $this->recordView($post['id']);
-        return response()->json($post);
+        $token = $this->recordView($post['id']);
+        $response = response()->json($post);
+        if ($token) {
+            $response->cookie(
+                'visitor_token',
+                $token,
+                60 * 24 * 90,
+                '/',
+                null,
+                false, // secure false for localhost
+                true,  // httpOnly
+                false,
+                'Lax'
+            );
+        }
+        return $response;
     }
 
     public function createPost(Request $request)
@@ -67,7 +81,7 @@ class PostController extends Controller
         return $this->delete($id);
     }
 
-    private function recordView(int $post_id): void
+    private function recordView(int $post_id): ?string
     {
         if (auth()->check()) {
 
@@ -83,28 +97,21 @@ class PostController extends Controller
                 ]);
             }
 
-            return;
+            return null;
         }
 
-        // Guest
         $token = Cookie::get('visitor_token');
 
         if (! $token) {
             $token = Str::uuid()->toString();
 
-            Cookie::queue(
-                Cookie::make(
-                    'visitor_token',
-                    $token,
-                    60 * 24 * 90 // 90 days cookie duration
-                )
-            );
+            $exists = false;
+        } else {
+            $exists = View::where('post_id', $post_id)
+                ->where('visitor_token', $token)
+                ->where('created_at', '>=', now()->subDay())
+                ->exists();
         }
-
-        $exists = View::where('post_id', $post_id)
-            ->where('visitor_token', $token)
-            ->where('created_at', '>=', now()->subDay())
-            ->exists();
 
         if (! $exists) {
             View::create([
@@ -112,6 +119,8 @@ class PostController extends Controller
                 'visitor_token' => $token,
             ]);
         }
+
+        return Cookie::get('visitor_token') ? null : $token;
     }
 
 }

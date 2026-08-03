@@ -41,7 +41,7 @@ Route::middleware('reject.get.body')->group(function () {
     //Posts
     Route::get('/posts', [\App\Http\Controllers\PostController::class, 'getPosts']);
     Route::get('/posts/latest', [\App\Http\Controllers\PostController::class, 'getLatestPosts']);
-    Route::middleware('auth:sanctum')->get('/posts/{id}', [\App\Http\Controllers\PostController::class, 'getPost']);
+    Route::middleware('optional.auth')->get('/posts/{id}', [\App\Http\Controllers\PostController::class, 'getPost']);
 
     //Categories
     Route::get('/categories', [\App\Http\Controllers\CategoryController::class, 'categories']);
@@ -55,7 +55,7 @@ Route::middleware('reject.get.body')->group(function () {
     //Comments
     Route::get('/comments', [\App\Http\Controllers\CommentController::class, 'getComments']);
     Route::get('/comments/count', [\App\Http\Controllers\CommentController::class, 'getCommentsCount']);
-    Route::middleware('auth:sanctum')->get('/comments/{post_id}', [\App\Http\Controllers\CommentController::class, 'getCommentsByPost']);
+    Route::middleware('optional.auth')->get('/comments/{post_id}', [\App\Http\Controllers\CommentController::class, 'getCommentsByPost']);
 
     //Reactions
     Route::get('/reactions', [\App\Http\Controllers\ReactionController::class, 'getReactions']);

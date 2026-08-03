@@ -20,7 +20,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
             'block.auth' => \App\Http\Middleware\BlockAuthMiddleware::class,
-            'reject.get.body' => \App\Http\Middleware\RejectGetWithBody::class
+            'reject.get.body' => \App\Http\Middleware\RejectGetWithBody::class,
+            'optional.auth' => \App\Http\Middleware\OptionalAuthMiddleware::class
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
