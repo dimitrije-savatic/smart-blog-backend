@@ -77,7 +77,6 @@ abstract class Controller
             throw new ApiException('NOT_FOUND', class_basename($this->modelClass) . ' not found.', 404);
         }
         $this->beforeUpdate($request);
-//        $this->authorize('update', $item);
         $data = validate($request, $updateRules, [], 'update', [], $item);
         try {
             $item->update($data);
@@ -95,7 +94,6 @@ abstract class Controller
         if (!$item) {
             throw new ApiException('NOT_FOUND', class_basename($this->modelClass) . ' not found.', 404);
         }
-//        $this->authorize('delete', $item);
         try {
             $item->delete();
             ActivityLogService::log('delete', auth()->user()->username . ' deleted ' . strtolower(class_basename($this->modelClass)) . '.', $item);

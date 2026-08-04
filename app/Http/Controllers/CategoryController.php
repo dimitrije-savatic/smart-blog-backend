@@ -23,7 +23,7 @@ class CategoryController extends Controller
 
     public function createCategory(Request $request)
     {
-        return $this->create($request);
+        return $this->create($request, $this->createRules);
     }
 
     public function deleteCategory(int $id)
@@ -33,6 +33,6 @@ class CategoryController extends Controller
 
     public function updateCategory(Request $request, int $id)
     {
-        return $this->update($request, $id);
+        return $this->update($request, $id, $this->updateRules);
     }
 }
