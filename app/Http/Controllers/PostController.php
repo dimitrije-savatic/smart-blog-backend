@@ -36,12 +36,12 @@ class PostController extends Controller
 
     public function getPosts()
     {
-        return Post::with('categories')->get();
+        return Post::with('categories')->withCount(['views', 'comments'])->get();
     }
 
     public function getLatestPosts() {
 
-        $posts = Post::latest()->with(['categories', 'comments'])->withCount('views')->take(3)->get();
+        $posts = Post::latest()->with('categories')->withCount(['views', 'comments'])->take(3)->get();
         return response()->json($posts);
     }
 
