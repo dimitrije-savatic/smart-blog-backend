@@ -34,9 +34,63 @@ class PostController extends Controller
         $item->categories()->sync($request->category_ids);
     }
 
-    public function getPosts()
+    public function getPosts(Request $request)
     {
-        return Post::with('categories')->withCount(['views', 'comments'])->get();
+        $request->validate([
+            'search' => ['nullable', 'string', 'max:100'],
+            'category' => ['nullable', 'integer', 'exists:categories,id'],
+            'sort' => [
+                'nullable',
+                'in:newest,oldest,most-viewed,most-liked'
+            ],
+        ]);
+
+        $query = Post::query()->with('categories')
+            ->withCount([
+                'views',
+                'comments',
+                'reactions as likes_count' => function ($q) {
+                    $q->where('type', 'like');
+                }
+            ]);
+
+        // Search
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('body', 'like', "%{$search}%");
+            });
+        }
+
+        // Category
+        if ($request->filled('category')) {
+            $query->whereHas('categories', function ($q) use ($request) {
+                $q->where('categories.id', $request->category);
+            });
+        }
+
+        // Sorting
+        switch ($request->input('sort')) {
+            case 'oldest':
+                $query->oldest();
+                break;
+
+            case 'most-viewed':
+                $query->orderByDesc('views_count');
+                break;
+
+            case 'most-liked':
+                $query->orderByDesc('likes_count');
+                break;
+
+            case 'newest':
+            default:
+                $query->latest();
+                break;
+        }
+        return response()->json($query->get());
     }
 
     public function getLatestPosts() {
@@ -45,7 +99,7 @@ class PostController extends Controller
         return response()->json($posts);
     }
 
-    public function getPost(int $id)
+    public function getDetailedPost(int $id)
     {
         $post = $this->postService->getPostDetails($id);
         $token = $this->recordView($post['id']);

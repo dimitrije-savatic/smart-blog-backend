@@ -5,6 +5,8 @@ use Illuminate\Http\Request;
 
 // Authenticated User only routes
 Route::middleware('auth:sanctum')->group(function () {
+
+    // Admin only routes
     Route::middleware('role:admin')->group(function () {
         //Posts
         Route::delete('/posts/{id}', [\App\Http\Controllers\PostController::class, 'deletePost']);
@@ -15,6 +17,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/categories/{id}', [\App\Http\Controllers\CategoryController::class, 'deleteCategory']);
         Route::put('/categories/{id}', [\App\Http\Controllers\CategoryController::class, 'updateCategory']);
     });
+
     //Posts
     Route::post('/posts', [\App\Http\Controllers\PostController::class, 'createPost']);
 
@@ -39,12 +42,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [\App\Http\Controllers\AuthController::class, 'logout']);
 });
 
+Route::get('/posts', [\App\Http\Controllers\PostController::class, 'getPosts']);
+
 // GET routes
 Route::middleware('reject.get.body')->group(function () {
     //Posts
-    Route::get('/posts', [\App\Http\Controllers\PostController::class, 'getPosts']);
     Route::get('/posts/latest', [\App\Http\Controllers\PostController::class, 'getLatestPosts']);
-    Route::middleware('optional.auth')->get('/posts/{id}', [\App\Http\Controllers\PostController::class, 'getPost']);
+    Route::middleware('optional.auth')->get('/posts/{id}', [\App\Http\Controllers\PostController::class, 'getDetailedPost']);
 
     //Categories
     Route::get('/categories', [\App\Http\Controllers\CategoryController::class, 'categories']);
