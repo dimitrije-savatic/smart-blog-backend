@@ -45,7 +45,7 @@ class PostController extends Controller
             ],
         ]);
 
-        $query = Post::query()->with('categories')
+        $query = Post::query()->with(['categories', 'author'])
             ->withCount([
                 'views',
                 'comments',

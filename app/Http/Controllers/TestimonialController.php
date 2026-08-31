@@ -15,15 +15,15 @@ class TestimonialController extends Controller
 
     public function getTestimonials()
     {
-        return Testimonial::with('user')->orderBy('testimonials.created_at', 'desc')->get();
+        return Testimonial::with('user')->orderByDesc('testimonials.created_at')->get();
     }
 
     public function createTestimonial(Request $request){
-        return $this->create($request);
+        return $this->create($request, $this->createRules);
     }
 
     public function updateTestimonial(Request $request, int $id){
-        return $this->update($request, $id);
+        return $this->update($request, $id, $this->updateRules);
     }
 
     public function deleteTestimonial(int $id){

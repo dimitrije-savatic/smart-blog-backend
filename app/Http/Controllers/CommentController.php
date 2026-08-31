@@ -19,6 +19,7 @@ class CommentController extends Controller
     }
 
     protected string $modelClass = Comment::class;
+
     protected array $createRules = [
         'body' => 'required|string|min:3',
         'user_id' => 'required|integer',
@@ -44,16 +45,16 @@ class CommentController extends Controller
         if (!$item) {
             throw new ApiException('NOT_FOUND', class_basename($this->modelClass) . ' not found.', 404);
         }
-        return response()->json($item, 200);
+        return response()->json($item);
     }
 
     public function addComment(Request $request)
     {
-        return $this->create($request);
+        return $this->create($request, $this->createRules);
     }
 
     public function updateComment(Request $request, int $id){
-        return $this->update($request, $id);
+        return $this->update($request, $id, $this->updateRules);
     }
 
     public function deleteComment(int $id){

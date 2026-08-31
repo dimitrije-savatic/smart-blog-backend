@@ -42,7 +42,7 @@ abstract class Controller
             throw new ApiException('NOT_FOUND', class_basename($this->modelClass) . ' not found.', 404);
         }
         $item = $this->afterGetById($item);
-        return response()->json($item, 200);
+        return response()->json($item);
     }
 
     public function getAll(): \Illuminate\Http\JsonResponse
@@ -52,7 +52,7 @@ abstract class Controller
             throw new ApiException('NOT_FOUND', class_basename($this->modelClass) . ' not found.', 404);
         }
         $items = $this->afterGetAll($items);
-        return response()->json($items, 200);
+        return response()->json($items);
     }
 
     public function create(Request $request,array $createRules): \Illuminate\Http\JsonResponse

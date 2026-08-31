@@ -26,11 +26,11 @@ class ReactionController extends Controller
 
     public function getReactionsByPost(int $id)
     {
-        $item = ($this->modelClass)::where('reactable_id', $id)->firstOrFail();
+        $item = ($this->modelClass)::where('reactable_id', $id)->first();
         if (!$item) {
             throw new ApiException('NOT_FOUND', class_basename($this->modelClass) . ' not found.', 404);
         }
-        return response()->json([$item], 200);
+        return response()->json($item);
     }
 
     public function  getReactionsCount() {
@@ -38,7 +38,7 @@ class ReactionController extends Controller
         if (!$item) {
             throw new ApiException('NOT_FOUND', class_basename($this->modelClass) . ' not found.', 404);
         }
-        return response()->json($item, 200);
+        return response()->json($item);
     }
 
     public function addReaction(Request $request): \Illuminate\Http\JsonResponse
