@@ -21,7 +21,7 @@ class PostController extends Controller
     }
 
     protected string $modelClass = Post::class;
-    protected array $createRules = [ 'id' => 'required|number','title' => 'required|string|min:5|max:100', 'body' => 'required|string|min:10', 'user_id' => 'required|integer', 'category_ids'=> 'required|array'];
+    protected array $createRules = ['title' => 'required|string|min:5|max:100', 'body' => 'required|string|min:10', 'user_id' => 'required|integer', 'category_ids'=> 'required|array'];
     protected array $updateRules = ['id' => 'number', 'title' => 'string|min:5|max:100', 'body' => 'string|min:10', 'user_id' => 'integer', 'category_ids'=> 'array'];
 
     protected function afterCreate(Request $request, Model $item) : void

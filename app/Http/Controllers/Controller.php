@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Exceptions\ApiException;
+use App\Models\Comment;
+use App\Models\Post;
 use App\Models\Reaction;
 use App\Services\ActivityLogService;
 use Illuminate\Http\JsonResponse;
@@ -17,6 +19,7 @@ abstract class Controller
     protected array $reactRules = [];
 
     // ---- HOOKS ----
+
     protected function beforeCreate(array $data) {}
 
     protected function afterCreate(Request $request, Model $item): void {}
@@ -64,7 +67,7 @@ abstract class Controller
             $this->afterCreate($request, $item);
             ActivityLogService::log('create', auth()->user()->username . ' created ' . strtolower(class_basename($this->modelClass)) . '.', $item);
             $item->refresh();
-            return response()->json([], 201);
+            return response()->json("", 201);
         } catch (\Throwable $e) {
             throw new ApiException('SERVER_ERROR', $e->getMessage(), 500);
         }
@@ -82,7 +85,7 @@ abstract class Controller
             $item->update($data);
             $this->afterUpdate($request, $item);
             ActivityLogService::log('update', auth()->user()->username . ' updated ' . strtolower(class_basename($this->modelClass)) . '.', $item);
-            return response()->json([], 204);
+            return response()->json("", 204);
         } catch (\Throwable $e) {
             throw new ApiException('SERVER_ERROR', $e->getMessage(), 500);
         }
@@ -97,24 +100,39 @@ abstract class Controller
         try {
             $item->delete();
             ActivityLogService::log('delete', auth()->user()->username . ' deleted ' . strtolower(class_basename($this->modelClass)) . '.', $item);
-            return response()->json([], 204);
+            return response()->json("", 204);
         } catch (\Throwable $e) {
             throw new ApiException('SERVER_ERROR', $e->getMessage(), 500);
         }
     }
 
-    public function react(Request $request): \Illuminate\Http\JsonResponse
+    public function react(Request $request, array $reactRules): \Illuminate\Http\JsonResponse
     {
-        $data = validate($request, $this->reactRules);
+        $data = validate($request, $reactRules);
         $existing = Reaction::where([
             'user_id' => auth()->id(),
-            'reactable_id' => $request->reactable_id,
-            'reactable_type' => $request->reactable_type,
+            'reactable_id' => $data['reactable_id'],
+            'reactable_type' => $data['reactable_type'],
         ])->first();
-        $existingModel = $this->modelClass::find($request->reactable_id);
-        if (!$existingModel) {
-            return response()->json(['message' => class_basename($this->modelClass) . ' doesn\'t exist.'], 404);
+        $existingPost = Post::find($data['reactable_id']);
+        $existingComment = Comment::find($data['reactable_id']);
+        if (!$existingPost && !$existingComment) {
+            return response()->json(['message' => 'Model you want to react to doesn\'t exist.'], 404);
         }
+
+        //update if type is different
+        if ($existing && $existing->type !== $data['type']){
+            $existing->update(
+                [
+                    'user_id' => auth()->id(),
+                    'reactable_id' => $data['reactable_id'],
+                    'reactable_type' => $data['reactable_type'],
+                    'type' => $data['type']
+                ]
+            );
+            return response()->json("", 204);
+        }
+
         // remove if same reaction
         if ($existing && $existing->type === $data['type']) {
             $existing->delete();
@@ -125,19 +143,15 @@ abstract class Controller
         }
 
         // otherwise create/update
-        $reaction = Reaction::updateOrCreate(
+        $reaction = Reaction::create(
             [
                 'user_id' => auth()->id(),
-                'reactable_id' => $request->reactable_id,
-                'reactable_type' => $request->reactable_type,
-            ],
-            [
-                'type' => $data['type'],
+                'reactable_id' => $data['reactable_id'],
+                'reactable_type' => $data['reactable_type'],
+                'type' => $data['type']
             ]
         );
 
-        return response()->json([
-            'message' => 'Reaction saved.',
-        ], 201);
+        return response()->json("", 201);
     }
 }
