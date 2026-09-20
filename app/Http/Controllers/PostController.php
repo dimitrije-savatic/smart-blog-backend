@@ -34,6 +34,11 @@ class PostController extends Controller
         $item->categories()->sync($request->category_ids);
     }
 
+    protected function beforeDelete(Model $item): void
+    {
+        $item->categories()->detach();
+    }
+
     public function getPosts(Request $request)
     {
         $request->validate([

@@ -88,29 +88,6 @@ if (!function_exists('validate')) {
 
         $validated = $validator->validated();
 
-        // 5️. Detect no actual changes (only for update mode and if model provided)
-        if ($mode === 'update' && $model) {
-            $unchanged = [];
-            foreach ($validated as $key => $value) {
-                // Compare only if model has this attribute
-                if ($model->isFillable($key) && $model->{$key} == $value) {
-                    $unchanged[] = $key;
-                }
-            }
-
-            // If *all* provided fields are unchanged
-            if (count($unchanged) === count($validated)) {
-                throw new HttpResponseException(response()->json([
-                    'error' => [
-                        'code' => 422,
-                        'name' => 'NO_CHANGES_DETECTED',
-                        'message' => 'No changes were detected. Please provide at least one modified value.',
-                        'details' => $unchanged,
-                    ],
-                ], 422));
-            }
-        }
-
         return $validated;
     }
 }

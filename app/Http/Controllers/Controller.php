@@ -38,6 +38,8 @@ abstract class Controller
 
     protected function afterUpdate(Request $request, Model $item): void {}
 
+    protected function beforeDelete(Model $item): void {}
+
     public function getById(int $id): \Illuminate\Http\JsonResponse
     {
         $item = ($this->modelClass)::find($id);
@@ -98,6 +100,7 @@ abstract class Controller
             throw new ApiException('NOT_FOUND', class_basename($this->modelClass) . ' not found.', 404);
         }
         try {
+            $this->beforeDelete($item);
             $item->delete();
             ActivityLogService::log('delete', auth()->user()->username . ' deleted ' . strtolower(class_basename($this->modelClass)) . '.', $item);
             return response()->json("", 204);
