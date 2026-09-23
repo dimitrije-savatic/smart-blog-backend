@@ -20,6 +20,7 @@ class PostService
             'id' => $post->id,
             'title' => $post->title,
             'body' => $post->body,
+            'image' => $post->image,
             'author' => [
                 'id' => $post->author->id,
                 'username' => $post->author->username,

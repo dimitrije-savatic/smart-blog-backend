@@ -21,8 +21,8 @@ class EmailController extends Controller
     {
         $data = validate($request, $this->emailRules);
         try {
-            Mail::to('smart.blog@example.com')->send(new ContactFromMail($data));
-            return response()->json(['message' => 'Email sent successfully'], 200);
+            Mail::to($data['email'])->send(new ContactFromMail($data));
+            return response()->json([], 200);
         }catch (\Throwable $e) {
             throw new ApiException('MAIL_SEND_FAILED', $e->getMessage(), 500);
         }

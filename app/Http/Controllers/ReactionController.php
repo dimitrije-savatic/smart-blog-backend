@@ -59,10 +59,11 @@ class ReactionController extends Controller
     public function counts(){
         $counts = [User::class, View::class, Comment::class, Reaction::class];
         foreach ($counts as $count) {
-            if (!($count)::all()->count()) {
-                throw new ApiException('NOT_FOUND', class_basename($this->modelClass) . ' not found.', 404);
+            if (($count)::all()->count() < 0) {
+                throw new ApiException('NOT_FOUND', class_basename($count) . ' not found.', 404);
             }
         }
+
         $users = User::all()->count();
         $views = View::all()->count();
         $reactions = Reaction::all()->count();
